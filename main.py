@@ -1,3 +1,4 @@
+import database
 import json
 from pprint import pprint
 
@@ -16,8 +17,12 @@ def filter_fr_categories(categories):
     return fr_categories
 
 
+db = database.Database()
 
 raw_categories = read_categories_from_json()
 clean_fr_categories = filter_fr_categories(raw_categories)
 
-pprint(clean_fr_categories)
+for item in clean_fr_categories:
+    db.write_category(item['off_id'], item['name'])
+
+
