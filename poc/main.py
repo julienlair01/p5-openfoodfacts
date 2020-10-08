@@ -21,9 +21,15 @@ def get_products_from_off(category_tag):
 
 db = database.Database()
 db.connect_to_db()
-db.write_categories(get_json_from_off('https://fr.openfoodfacts.org/categories.json'))
-print('Category table updated.')
-db.write_products(get_products_from_off('fr:pates-a-tartiner'))
-print('Product table updated.')
+fd = open('poc/db_management/create_db.sql', 'r')
+sqlFile = fd.read()
+fd.close()
+db.exec_file(sqlFile)
+
+
+# db.write_categories(get_json_from_off('https://fr.openfoodfacts.org/categories.json'))
+# print('Category table updated.')
+# db.write_products(get_products_from_off('fr:pates-a-tartiner'))
+# print('Product table updated.')
 db.disconnect_from_db()
 

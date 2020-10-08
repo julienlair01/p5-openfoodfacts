@@ -11,6 +11,7 @@ config = {
     'raise_on_warnings': True
 }
 
+
 class Database():
     """
     docstring
@@ -22,10 +23,18 @@ class Database():
     def connect_to_db(self):
         self.cnx = mysql.connector.connect(**config)
         self.cnx.raise_on_warnings = False
-    
+
 
     def disconnect_from_db(self):
         self.cnx.close()
+
+    def exec_file(self, query):
+        cursor = self.cnx.cursor()
+        cursor.execute(query)
+        self.cnx.commit()
+        cursor.close()
+
+
 
 
     def write_categories(self, categories):
