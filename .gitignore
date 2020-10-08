@@ -1,2 +1,4 @@
 .vscode/
-sqltools_20201004223653_33793.log
+*.log
+poc/
+
