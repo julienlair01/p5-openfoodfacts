@@ -3,11 +3,13 @@
 
 """
 
-import services
+from services import services
+import ui
 
 from pprint import pprint
 
 db_service = services.DatabaseService()
-services.CategoryService(db_service)
+cat_service = services.CategoryService(db_service)
 product_service = services.ProductService()
-# product_service.get_products_from_off('fr:pates-a-tartiner', db_service)
+ui = ui.UI(cat_service, db_service)
+product_service.get_products_from_off(id, db_service, cat_service)

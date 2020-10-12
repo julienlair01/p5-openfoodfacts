@@ -26,8 +26,9 @@ class CategoryService():
     
     def __init__(self, db):
         self.categories = []
-        self.get_categories_from_off(db)
-        self.update_categories_in_db(db)
+        self.categories_local = []
+        # self.get_categories_from_off(db)
+        # self.update_categories_in_db(db)
     
     def get_categories_from_off(self, db):
         """  
@@ -62,13 +63,22 @@ class CategoryService():
                 db.cnx.commit()
         print('Inserted categories into db.')
 
+    def get_categories_from_local(self, db):
+        db.connect_to_db()
+
+        with db.cnx.cursor(named_tuple = True) as cursor:
+            cursor.execute(queries.get_categories)
+            for (id, name) in cursor:
+                self.categories_local.append(category.Category(id, name))
+        return self.categories_local
+
 
 class ProductService():
 
     def __init__(self):
         pass
 
-    def get_products_from_off(self, category, db):
+    def get_products_from_off(self, category_id, db, cat_service):
         """
         Retrieve the list of products of a given category, from
         the Open Food Facts API.
@@ -85,7 +95,7 @@ class ProductService():
                     'action': 'process',
                     'tagtype_0': 'categories',
                     'tag_contains_0': 'contains',
-                    'tag_0': category,
+                    'tag_0': cat_service.get_category_off_id(),
                     'json': 'true',
                     'page_size': page_size,
                     'page': 1 + skip//page_size
@@ -161,7 +171,7 @@ class DatabaseService():
         config -- dict containing the configuration parameters (see constant)
         """
         self.cnx = mysql.connector.connect(**self.config)
-        print('DB connection status:', self.cnx.is_connected())
+        # print('DB connection status:', self.cnx.is_connected())
 
     def disconnect_from_db(self):
         """

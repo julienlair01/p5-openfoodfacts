@@ -23,3 +23,10 @@ insert_user_favorite_product = ("INSERT INTO User_favorite_product (product_id) 
                                 "VALUES ("
                                     "%(product_id)s"
                                 ")")
+
+get_categories = ("SELECT id, name FROM Category "
+                    "ORDER BY name "
+                    "LIMIT 10")
+
+get_category_off_id = ("SELECT off_id FROM Category "
+                    "WHERE id = %(id)s")
