@@ -4,13 +4,22 @@ CREATE TABLE IF NOT EXISTS Product (
     name_fr VARCHAR(100) NOT NULL,
     generic_name VARCHAR(100),
     nutrition_grade_fr CHAR,
-    off_url VARCHAR(200),
+    url VARCHAR(200),
     PRIMARY KEY (id),
     UNIQUE KEY barcode (barcode)
 )
 ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Category (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    off_id VARCHAR(250) NOT NULL,
+    name VARCHAR(250),
+    PRIMARY KEY (id),
+    UNIQUE KEY off_id (off_id)
+)
+ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS Brand (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     off_id VARCHAR(250) NOT NULL,
     name VARCHAR(250),
@@ -30,6 +39,20 @@ CREATE TABLE IF NOT EXISTS Product_category (
     CONSTRAINT fk_category_prod_id
         FOREIGN KEY (category_id)
         REFERENCES Category(id)
+)
+ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS Product_brand (
+    product_id INT UNSIGNED NOT NULL,
+    brand_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (product_id, brand_id),
+    UNIQUE KEY product_brand (product_id, brand_id),
+    CONSTRAINT fk_product_brand_id
+        FOREIGN KEY (product_id)
+        REFERENCES Product(id),
+    CONSTRAINT fk_brand_prod_id
+        FOREIGN KEY (brand_id)
+        REFERENCES Brand(id)
 )
 ENGINE=InnoDB;
 

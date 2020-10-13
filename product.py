@@ -5,12 +5,11 @@
 
 class Product():
 
-    def __init__(self, name):
-        self.barcode = ''
+    def __init__(self, barcode, name, nutrition_score, url):
+        self.barcode = barcode
         self.name = name
-        self.nutrition_score = ''
-        self.stores = ''
-        self.brands = ''
+        self.nutrition_score = nutrition_score
+        self.url = url
 
     def get_product_details(self):
         """
