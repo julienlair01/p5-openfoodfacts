@@ -5,9 +5,9 @@
 
 class Product():
 
-    def __init__(self):
+    def __init__(self, name):
         self.barcode = ''
-        self.name = ''
+        self.name = name
         self.nutrition_score = ''
         self.stores = ''
         self.brands = ''

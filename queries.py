@@ -24,9 +24,17 @@ insert_user_favorite_product = ("INSERT INTO User_favorite_product (product_id) 
                                     "%(product_id)s"
                                 ")")
 
-get_categories = ("SELECT id, name FROM Category "
+get_categories = ("SELECT id, name, off_id FROM Category "
                     "ORDER BY name "
                     "LIMIT 10")
 
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
+
+get_products = ("SELECT p.name_fr FROM Product p "
+                "INNER JOIN Product_category pc ON p.id = pc.product_id "
+                "INNER JOIN Category c ON c.id = pc.category_id "
+                "WHERE pc.category_id = %(cat_id)s "
+                "GROUP BY p.name_fr "
+                "ORDER BY p.name_fr ASC "
+                "LIMIT 20")

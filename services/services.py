@@ -5,6 +5,7 @@
 
 import category
 import queries
+import product
 
 from pprint import pprint
 import mysql.connector
@@ -21,56 +22,56 @@ CLEAR_DATA_FILE = '/Users/julienlair/Formation_Python/projet5/app/drop_tables.sq
 URL_PRODUCTS = 'https://fr.openfoodfacts.org/cgi/search.pl'
 
 
-
 class CategoryService():
     
     def __init__(self, db):
         self.categories = []
-        self.categories_local = []
-        # self.get_categories_from_off(db)
-        # self.update_categories_in_db(db)
-    
+        self.filter_categories = [
+            'fr:pates-a-tartiner'
+        ]
+
     def get_categories_from_off(self, db):
         """  
         Get all categories from Open Food Facts and keeps only
         the FR and known categories.
-        Returns the results as a list of Category objects.
+
+        db -- Database object
         """
         cat_json  = requests.get('https://fr.openfoodfacts.org/categories.json').json()
         print('OK...Categories retrieved from Open Food Facts.') 
+        self.update_categories_in_db(db, cat_json)
 
-        for i in range(len(cat_json['tags'])):
-            if 'fr:' in cat_json['tags'][i]['id'] and cat_json['tags'][i]['known'] == 1:
-                self.categories.append(category.Category(off_id = cat_json['tags'][i]['id'], name = cat_json['tags'][i]['name']))
-            else:
-                pass
-        
-        print('List of Category objects created.') 
-
-    def update_categories_in_db(self, db):
+    def update_categories_in_db(self, db, cat_json):
         """
         Writes new categories in the local database.
-        categories -- list of Category objects
+        db -- Database object
+        cat_json -- json file containing categories to insert into local db
         """
         db.connect_to_db()
-        for i in range(len(self.categories)):
-            add_category = {
-                    'off_id': self.categories[i].off_id,
-                    'name': self.categories[i].name
-                }
-            with db.cnx.cursor() as cursor:
-                cursor.execute(queries.insert_category, add_category)
-                db.cnx.commit()
-        print('Inserted categories into db.')
+        with db.cnx.cursor() as cursor:
+            for i in range(len(cat_json['tags'])):
+                if 'fr:' in cat_json['tags'][i]['id'] and cat_json['tags'][i]['id'] in self.filter_categories and cat_json['tags'][i]['known'] == 1:
+                    add_category = {
+                        'off_id': cat_json['tags'][i]['id'],
+                        'name': cat_json['tags'][i]['name']
+                    }
+                    cursor.execute(queries.insert_category, add_category)
+        db.cnx.commit()
+        print('OK...Inserted categories into db.')
 
     def get_categories_from_local(self, db):
-        db.connect_to_db()
+        """
+        Get categories from local db.
+        Returns a list of Category objects.
 
+        db -- Database object
+        """
+        db.connect_to_db()
         with db.cnx.cursor(named_tuple = True) as cursor:
             cursor.execute(queries.get_categories)
-            for (id, name) in cursor:
-                self.categories_local.append(category.Category(id, name))
-        return self.categories_local
+            for (id, name, off_id) in cursor:
+                self.categories.append(category.Category(id, name, off_id))
+        return self.categories
 
 
 class ProductService():
@@ -78,34 +79,69 @@ class ProductService():
     def __init__(self):
         pass
 
-    def get_products_from_off(self, category_id, db, cat_service):
+    def get_products (self, db, cat_service, category):
+        """
+        Checks if products already exist in the lcoal db for this category.
+        If yes, returns a list of Product objects.
+        If no, gets the product from OFF.
+        """
+        products = []
+        with db.cnx.cursor(buffered=True) as cursor:
+            cat = {'cat_id': category.id}
+            cursor.execute(queries.get_products, cat)
+            print('Rows:', cursor.rowcount)
+            if cursor.rowcount > 0:
+                print('Products found.')
+                for (name,) in cursor.fetchall():
+                    print(name)
+                    products.append(product.Product(name = name))
+            else:
+                print('No product found.')
+                self.get_products_from_off(db, cat_service, category)
+                self.get_products(db, cat_service, category)
+        return products
+
+    def get_products_from_off(self, db, cat_service, category):
         """
         Retrieve the list of products of a given category, from
         the Open Food Facts API.
 
-        category_tag -- category tag from the Category table
+        db -- DatabaseService object
+        cat_service -- CategoryService object
+        category_id -- id of the category to get products from
         """
-        products = {}
         page_size = 50
         i = 0
         skip = 0
-
         while i >= 0:
             payload = {
                     'action': 'process',
                     'tagtype_0': 'categories',
                     'tag_contains_0': 'contains',
-                    'tag_0': cat_service.get_category_off_id(),
+                    'tag_0': category.off_id,
                     'json': 'true',
                     'page_size': page_size,
                     'page': 1 + skip//page_size
                     }
             r = requests.get(url=URL_PRODUCTS, params=payload)
-            products = self.clean_products(r.json())
-            self.add_product_to_db(products, db, category)
-            print('Products inserted, page', 1 + skip//page_size)
+            clean_products = self.clean_products(r.json())
+            self.add_product_to_db(clean_products, db, category.off_id)
             skip += page_size
             i = int(r.json()['count']) - skip
+
+    def clean_products(self, products):
+        """
+        Method to clean products which do not have specific keys,
+        contained in keys[].
+        """
+        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url']
+        for i in range(len(products['products'])):
+            for j in range(len(keys)):
+                try:
+                    buf = products['products'][i][keys[j]]
+                except KeyError:
+                    products['products'][i][keys[j]] = ''
+        return products
 
     def add_product_to_db(self, products, db, category):
         """
@@ -113,7 +149,7 @@ class ProductService():
         Stores the relationship between product and category
         in the local database.
 
-        products -- dict of products to be added
+        products -- json of products to be added
         db -- DatabaseService object
         category -- str being the Open Food Facts id of a category
         """
@@ -134,24 +170,6 @@ class ProductService():
                 }
                 cursor.execute(queries.insert_product_category, add_product_category) 
                 db.cnx.commit()
-                
-        print('Inserted products into db.')
-        print('Inserted product categories into db.')
-
-    def clean_products(self, products):
-        """
-        Method to clean products which do not have specific keys,
-        contained in keys[].
-        """
-        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url']
-        for i in range(len(products['products'])):
-            for j in range(len(keys)):
-                try:
-                    buf = products['products'][i][keys[j]]
-                except KeyError:
-                    products['products'][i][keys[j]] = ''
-        return products
-        pass
 
 
 class DatabaseService():
@@ -159,8 +177,9 @@ class DatabaseService():
     def __init__(self):
         self.config = DB_CONFIG
         self.connect_to_db()
-        # self.clear_tables()
+        self.clear_tables()
         self.init_tables()
+        self.disconnect_from_db()
 
     def __del__(self):
         self.disconnect_from_db()
@@ -171,7 +190,6 @@ class DatabaseService():
         config -- dict containing the configuration parameters (see constant)
         """
         self.cnx = mysql.connector.connect(**self.config)
-        # print('DB connection status:', self.cnx.is_connected())
 
     def disconnect_from_db(self):
         """
@@ -179,7 +197,6 @@ class DatabaseService():
         config -- dict containing the configuration parameters (see constant)
         """
         self.cnx.close()
-        print('DB connection status:', self.cnx.is_connected())
 
     def init_tables(self):
         """
@@ -188,15 +205,11 @@ class DatabaseService():
         with open(INIT_TABLES_FILE, 'r') as f:
             with self.cnx.cursor() as cursor:
                 cursor.execute(f.read(), multi=True)
-        print('Tables created.')
-        print('DB connection status:', self.cnx.is_connected())
 
     def clear_tables(self):
-        # self.connect_to_db()
         with open(CLEAR_DATA_FILE, 'r') as f:
             with self.cnx.cursor() as cursor:
                 cursor.execute(f.read(), multi=True)
                 self.cnx.commit()
         print('Tables dropped.')
-        print('DB connection status:', self.cnx.is_connected())
 

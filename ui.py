@@ -21,10 +21,13 @@ Choisissez la catégorie du produit à substituer :
 
 class UI():
 
-    def __init__(self, cat, db):
-        self.show_menu(cat, db)
+    def __init__(self):
+        pass
 
-    def show_menu(self, cat, db):
+    def menu_logic(self):
+        pass
+
+    def show_menu(self, categories):
         choice = ''
         while (choice not in ['1','2']):
             os.system('clear')
@@ -32,18 +35,16 @@ class UI():
             choice = input('Quel est votre choix ? ')
         
         if choice == '1':
-            self.choose_category(cat, db)
+            return(self.choose_category(categories))
         elif choice == '2':
             self.choose_favorite()
 
-    def choose_category(self, cat, db):
+    def choose_category(self, categories):
         print(SELECT_CAT)
-        cat = cat.get_categories_from_local(db)
-        for index, value in enumerate(cat):
-            print(index, '-', cat[index].name)
-        choice = ''
+        for index, value in enumerate(categories):
+            print(index+1, '-', categories[index].name)
         choice = input('\nChoisissez une catégorie : ')
-        self.chosen_category = cat[int(choice)].id
+        return(categories[int(choice) - 1])
 
     def choose_favorite(self):
         pass

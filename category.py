@@ -7,9 +7,10 @@ import queries
 
 class Category():
 
-    def __init__(self, id, name):
+    def __init__(self, id, name, off_id):
         self.id = id
         self.name = name
+        self.off_id = off_id
 
     def get_category_details(self, category_id, db):
         """
