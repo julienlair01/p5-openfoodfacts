@@ -40,8 +40,15 @@ get_categories = ("SELECT id, name, off_id FROM Category "
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
 
-get_products_full = ("SELECT p.name_fr, p.barcode, p.nutrition_grade_fr, p.url FROM Product p "
+get_products = ("SELECT id FROM Product p "
                 "INNER JOIN Product_category pc ON p.id = pc.product_id "
                 "WHERE pc.category_id = %(cat_id)s AND p.name_fr != '' "
                 "ORDER BY p.name_fr ASC "
                 "LIMIT 20")
+
+get_product_details = ("SELECT barcode, name_fr, nutrition_grade_fr, url, b.name, c.name FROM Product p " 
+                        "INNER JOIN Product_category pc ON pc.product_id = p.id "
+                        "INNER JOIN Category c ON c.id = pc.category_id "
+                        "INNER JOIN Product_brand pb ON pc.product_id = pb.product_id "
+                        "INNER JOIN Brand b ON pb.brand_id = b.id "
+                        "WHERE p.id = %(id)s")

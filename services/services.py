@@ -90,11 +90,10 @@ class ProductService():
         """
         products = []
         with db.cnx.cursor(buffered=True) as cursor:
-            cat = {'cat_id': category.id}
-            cursor.execute(queries.get_products_full, cat)
+            cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
-                for (name_fr, barcode, nutrition_grade_fr, url) in cursor.fetchall():
-                    products.append(product.Product(barcode = barcode, name = name_fr, nutrition_score = nutrition_grade_fr, url = url))
+                for (id,) in cursor.fetchall():
+                    products.append(product.Product(id = id))
             else:
                 self.get_products_from_off(db, cat_service, category)
                 return self.get_products(db, cat_service, category)
@@ -151,6 +150,8 @@ class ProductService():
         Add products to the local database.
         Stores the relationship between product and category
         in the local database.
+        Stores the relationship between product and brands in
+        the local database
 
         products -- json of products to be added
         db -- DatabaseService object
@@ -167,17 +168,17 @@ class ProductService():
 
             with db.cnx.cursor() as cursor:
                 cursor.execute(queries.insert_product, add_product)  
+                last_product_id = cursor.lastrowid
                 add_product_category = {
-                    'product_id': cursor.lastrowid,
+                    'product_id': last_product_id,
                     'category': category,
                 }
                 cursor.execute(queries.insert_product_category, add_product_category)
                 brands = products['products'][i]['brands'].split(',') 
-                print(brands)
 
                 for j in range(len(brands)):
                     add_product_brand = {
-                        'product_id': cursor.lastrowid,
+                        'product_id': last_product_id,
                         'brand': brands[j]
                     }
                     cursor.execute(queries.insert_product_brand, add_product_brand)
