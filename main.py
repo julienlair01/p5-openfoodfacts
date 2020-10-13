@@ -20,11 +20,8 @@ class App():
         self.cat_service.get_categories_from_off(self.db_service)
         categories = self.cat_service.get_categories_from_local(self.db_service)
         chosen_category = self.ui.show_menu(categories)
-        self.products = self.product_service.get_products(self.db_service, self.cat_service, chosen_category)
-        print(self.products)
+        products = self.product_service.get_products(self.db_service, self.cat_service, chosen_category)
+        print(products)
 
 app = App()
 app.main_logic()
-
-# product_service = services.ProductService()
-# product_service.get_products_from_off(id, db_service, cat_service)

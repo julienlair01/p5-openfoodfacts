@@ -79,13 +79,14 @@ class ProductService():
     def __init__(self):
         pass
 
-    def get_products (self, db, cat_service, category):
+    def get_products(self, db, cat_service, category):
         """
         Checks if products already exist in the lcoal db for this category.
         If yes, returns a list of Product objects.
         If no, gets the product from OFF.
         """
         products = []
+        j = 0
         with db.cnx.cursor(buffered=True) as cursor:
             cat = {'cat_id': category.id}
             cursor.execute(queries.get_products, cat)
@@ -93,13 +94,13 @@ class ProductService():
             if cursor.rowcount > 0:
                 print('Products found.')
                 for (name,) in cursor.fetchall():
-                    print(name)
                     products.append(product.Product(name = name))
             else:
                 print('No product found.')
                 self.get_products_from_off(db, cat_service, category)
-                self.get_products(db, cat_service, category)
+                return self.get_products(db, cat_service, category)
         return products
+
 
     def get_products_from_off(self, db, cat_service, category):
         """
