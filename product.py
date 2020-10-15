@@ -5,8 +5,9 @@
 
 class Product():
 
-    def __init__(self, id):
+    def __init__(self, id, name):
         self.id = id
+        self.name = name
 
     def get_product_details(self):
         """

@@ -40,7 +40,7 @@ get_categories = ("SELECT id, name, off_id FROM Category "
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
 
-get_products = ("SELECT id FROM Product p "
+get_products = ("SELECT id, p.name_fr FROM Product p "
                 "INNER JOIN Product_category pc ON p.id = pc.product_id "
                 "WHERE pc.category_id = %(cat_id)s AND p.name_fr != '' "
                 "ORDER BY p.name_fr ASC "

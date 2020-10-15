@@ -32,6 +32,20 @@ class CategoryService():
             'Plats préparés',
             'Produits laitiers'
         ]
+        self.get_categories(db)
+
+    def get_categories(self, db):
+        """
+        Get categories, from local db if they exist,
+        or from Open Food Facts if they do not.
+        List Caterogy object in categories[]
+        
+        db -- DatabaseService object
+        """
+        self.get_categories_from_local(db)
+        if self.categories == []:
+            self.get_categories_from_off(db)
+            self.get_categories_from_local(db)
 
     def get_categories_from_off(self, db):
         """  
@@ -43,6 +57,21 @@ class CategoryService():
         cat_json  = requests.get('https://fr.openfoodfacts.org/categories.json').json()
         print('OK...Categories retrieved from Open Food Facts.') 
         self.update_categories_in_db(db, cat_json)
+
+    def get_categories_from_local(self, db):
+        """
+        Get categories from local db.
+        Returns a list of Category objects.
+
+        db -- Database object
+        """
+        db.connect_to_db()
+        with db.cnx.cursor(named_tuple = True, buffered = True) as cursor:
+            cursor.execute(queries.get_categories)
+            if cursor.rowcount > 0:
+                for (id, name, off_id) in cursor:
+                    self.categories.append(category.Category(id, name, off_id))
+        db.disconnect_from_db()
 
     def update_categories_in_db(self, db, cat_json):
         """
@@ -62,19 +91,9 @@ class CategoryService():
         db.cnx.commit()
         print('OK...Inserted categories into db.')
 
-    def get_categories_from_local(self, db):
-        """
-        Get categories from local db.
-        Returns a list of Category objects.
 
-        db -- Database object
-        """
-        db.connect_to_db()
-        with db.cnx.cursor(named_tuple = True) as cursor:
-            cursor.execute(queries.get_categories)
-            for (id, name, off_id) in cursor:
-                self.categories.append(category.Category(id, name, off_id))
-        return self.categories
+
+
 
 
 class ProductService():
@@ -92,8 +111,8 @@ class ProductService():
         with db.cnx.cursor(buffered=True) as cursor:
             cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
-                for (id,) in cursor.fetchall():
-                    products.append(product.Product(id = id))
+                for (id, name) in cursor.fetchall():
+                    products.append(product.Product(id = id, name = name))
             else:
                 self.get_products_from_off(db, cat_service, category)
                 return self.get_products(db, cat_service, category)
@@ -136,7 +155,7 @@ class ProductService():
         Method to clean products which do not have specific keys,
         contained in keys[].
         """
-        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url']
+        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands']
         for i in range(len(products['products'])):
             for j in range(len(keys)):
                 try:
@@ -191,8 +210,8 @@ class DatabaseService():
     def __init__(self):
         self.config = DB_CONFIG
         self.connect_to_db()
-        self.clear_tables()
-        self.init_tables()
+        # self.drop_tables()
+        self.create_tables()
         self.disconnect_from_db()
 
     def __del__(self):
@@ -212,20 +231,22 @@ class DatabaseService():
         """
         self.cnx.close()
 
-    def init_tables(self):
+    def create_tables(self):
         """
         Initializes the tables, if they do not already exist.
         """
         with open(INIT_TABLES_FILE, 'r') as f:
             with self.cnx.cursor() as cursor:
                 cursor.execute(f.read(), multi=True)
+        print('OK...Tables created.')
 
-    def clear_tables(self):
+
+    def drop_tables(self):
         with open(CLEAR_DATA_FILE, 'r') as f:
             with self.cnx.cursor() as cursor:
                 cursor.execute(f.read(), multi=True)
                 self.cnx.commit()
-        print('Tables dropped.')
+        print('OK...Tables dropped.')
 
 
 class BrandService():
