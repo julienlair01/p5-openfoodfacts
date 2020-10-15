@@ -42,11 +42,15 @@ count_brands = ("SELECT COUNT(*) as total FROM Brand")
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
 
-get_products = ("SELECT id, p.name_fr FROM Product p "
+get_products = ("SELECT p.id, p.name_fr, p.nutrition_grade_fr, p.url FROM Product p "
                 "INNER JOIN Product_category pc ON p.id = pc.product_id "
                 "WHERE pc.category_id = %(cat_id)s AND p.name_fr != '' "
-                "ORDER BY p.name_fr ASC "
-                "LIMIT 20")
+                "ORDER BY p.name_fr ASC")
+
+get_product_brands = ("SELECT b.name as 'brand name' FROM Brand b "
+                    "INNER JOIN Product_brand pb ON pb.brand_id = b.id "
+                    "INNER JOIN Product p ON p.id = pb.product_id "
+                    "WHERE p.id = %(id)s")
 
 get_product_details = ("SELECT barcode, name_fr, nutrition_grade_fr, url, b.name, c.name FROM Product p " 
                         "INNER JOIN Product_category pc ON pc.product_id = p.id "

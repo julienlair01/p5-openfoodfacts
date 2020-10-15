@@ -167,8 +167,8 @@ class ProductService():
         with db.cnx.cursor(buffered=True) as cursor:
             cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
-                for (id, name) in cursor.fetchall():
-                    self.products.append(product.Product(id = id, name = name))
+                for (id, name, nutrition_grade_fr, url) in cursor.fetchall():
+                    self.products.append(product.Product(db, id = id, name = name, nutrition_grade = nutrition_grade_fr, url = url))
             else:
                 self.get_products_from_off(db, cat_service, category)
                 return self.get_products(db, cat_service, category)
@@ -182,7 +182,8 @@ class ProductService():
         cat_service -- CategoryService object
         category_id -- id of the category to get products from
         """
-        page_size = 20
+        print('Veuillez patienter, nous téléchargeons les produits...')
+        page_size = 30
         # i = 0
         # skip = 0
         # while i >= 0:
@@ -265,7 +266,7 @@ class DatabaseService():
     def __init__(self):
         self.config = DB_CONFIG
         self.connect_to_db()
-        # self.drop_tables()
+        self.drop_tables()
         self.create_tables()
         self.disconnect_from_db()
 

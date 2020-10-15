@@ -19,7 +19,10 @@ class TUI():
         choice = ''
         while (choice not in ['1','2']):
             os.system('clear')
-            print('welcome')
+            print('''Bienvenue !
+1 - Trouver un subsitut plus sain à produit
+2 - Voir la liste de mes favoris\n'''
+            )
             choice = input('Quel est votre choix ? ')
         
         if choice == '1':
@@ -40,11 +43,11 @@ class TUI():
 
     def select_product(self, products):
         os.system('clear')
-        t = PrettyTable(['Choix', 'Produit'])
+        t = PrettyTable(['Choix', 'Produit', 'Marques'])
         t.align = 'l'
         t.vrules = NONE
         for index, value in enumerate(products):
-            t.add_row([index+1, products[index].name])
+            t.add_row([index+1, products[index].name, products[index].brands])
         print(t)
         choice = input('\nChoisissez un produit : ')
         return(products[int(choice) - 1])
