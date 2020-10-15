@@ -4,8 +4,8 @@ insert_category = ("INSERT IGNORE INTO Category (off_id, name) "
 insert_brand = ("INSERT IGNORE INTO Brand (off_id, name) "
                     "VALUES (%(off_id)s, %(name)s)")
 
-insert_product = ("INSERT IGNORE INTO Product (barcode, name_fr, generic_name, nutrition_grade_fr, url) "
-                    "VALUES (%(barcode)s, %(name_fr)s, %(generic_name)s, %(nutrition_grade_fr)s, %(url)s)")
+insert_product = ("INSERT IGNORE INTO Product (barcode, name_fr, nutrition_grade_fr, url) "
+                    "VALUES (%(barcode)s, %(name_fr)s, %(nutrition_grade_fr)s, %(url)s)")
 
 insert_product_category = ("INSERT IGNORE INTO Product_category ("
                                     "product_id, "
@@ -34,15 +34,14 @@ insert_user_favorite_product = ("INSERT INTO User_favorite_product (product_id) 
                                 ")")
 
 get_categories = ("SELECT id, name, off_id FROM Category "
-                    "ORDER BY name "
-                    "LIMIT 10")
+                    "ORDER BY name ")
 
 count_brands = ("SELECT COUNT(*) as total FROM Brand")
 
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
 
-get_products = ("SELECT p.id, p.name_fr, p.nutrition_grade_fr, p.url FROM Product p "
+get_products = ("SELECT p.id, p.name_fr, p.nutrition_grade_fr, p.url, p.barcode FROM Product p "
                 "INNER JOIN Product_category pc ON p.id = pc.product_id "
                 "WHERE pc.category_id = %(cat_id)s AND p.name_fr != '' "
                 "ORDER BY p.name_fr ASC")

@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS Product (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     barcode VARCHAR(13) NOT NULL,
     name_fr VARCHAR(100) NOT NULL,
-    generic_name VARCHAR(100),
     nutrition_grade_fr CHAR,
     url VARCHAR(200),
     PRIMARY KEY (id),

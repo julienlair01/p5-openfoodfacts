@@ -17,18 +17,19 @@ class TUI():
 
     def show_menu(self, categories):
         choice = ''
-        while (choice not in ['1','2']):
-            os.system('clear')
+        os.system('clear')
+        while choice not in [1,2]:
             print('''Bienvenue !
 1 - Trouver un subsitut plus sain à produit
 2 - Voir la liste de mes favoris\n'''
-            )
+                )       
             choice = input('Quel est votre choix ? ')
-        
-        if choice == '1':
-            return(self.select_category(categories))
-        elif choice == '2':
-            self.choose_favorite()
+            if choice == '1':
+                return(self.select_category(categories))
+            elif choice == '2':
+                self.choose_favorite()
+            else:
+                print('\nVeuillez entrer un choix valide.\n')
 
     def select_category(self, categories):
         os.system('clear')

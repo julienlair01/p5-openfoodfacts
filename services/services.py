@@ -5,7 +5,6 @@
 
 import category
 import queries
-import product
 
 from pprint import pprint
 import mysql.connector
@@ -19,22 +18,22 @@ DB_CONFIG = {
                 }
 INIT_TABLES_FILE = '/Users/julienlair/Formation_Python/projet5/app/create_tables.sql'
 CLEAR_DATA_FILE = '/Users/julienlair/Formation_Python/projet5/app/drop_tables.sql'
-URL_PRODUCTS = 'https://fr.openfoodfacts.org/cgi/search.pl'
 
 
 class CategoryService():
     
     def __init__(self, db):
         self.categories = []
+        self.db = db
         self.filter_categories = [
             'Fromages',
             'Boissons',
             'Plats préparés',
             'Produits laitiers'
         ]
-        self.get_categories(db)
+        self.load_categories(db)
 
-    def get_categories(self, db):
+    def load_categories(self, db):
         """
         Get categories, from local db if they exist,
         or from Open Food Facts if they do not.
@@ -42,14 +41,14 @@ class CategoryService():
         
         db -- DatabaseService object
         """
-        self.get_categories_from_local(db)
+        self.load_categories_from_local(db)
         if self.categories == []:
-            self.get_categories_from_off(db)
-            self.get_categories_from_local(db)
+            self.load_categories_from_off(db)
+            self.load_categories_from_local(db)
         else:
             print('OK...Categories already exist locally.') 
 
-    def get_categories_from_off(self, db):
+    def load_categories_from_off(self, db):
         """  
         Get all categories from Open Food Facts and keeps only
         the ones speciafied in filter_categories.
@@ -60,7 +59,7 @@ class CategoryService():
         print('OK...Categories retrieved from Open Food Facts.') 
         self.update_categories_in_db(db, cat_json)
 
-    def get_categories_from_local(self, db):
+    def load_categories_from_local(self, db):
         """
         Get categories from local db.
         Returns a list of Category objects.
@@ -151,114 +150,6 @@ class BrandService():
                 cursor.execute(queries.insert_brand, add_brand)
         db.cnx.commit()
         print('OK...Inserted brands into db.')
-
-
-class ProductService():
-
-    def __init__(self):
-        self.products = []
-
-    def get_products(self, db, cat_service, category):
-        """
-        Checks if products already exist in the lcoal db for this category.
-        If yes, returns a list of Product objects.
-        If no, gets the product from OFF.
-        """
-        with db.cnx.cursor(buffered=True) as cursor:
-            cursor.execute(queries.get_products, {'cat_id': category.id})
-            if cursor.rowcount > 0:
-                for (id, name, nutrition_grade_fr, url) in cursor.fetchall():
-                    self.products.append(product.Product(db, id = id, name = name, nutrition_grade = nutrition_grade_fr, url = url))
-            else:
-                self.get_products_from_off(db, cat_service, category)
-                return self.get_products(db, cat_service, category)
-
-    def get_products_from_off(self, db, cat_service, category):
-        """
-        Retrieve the list of products of a given category, from
-        the Open Food Facts API.
-
-        db -- DatabaseService object
-        cat_service -- CategoryService object
-        category_id -- id of the category to get products from
-        """
-        print('Veuillez patienter, nous téléchargeons les produits...')
-        page_size = 30
-        # i = 0
-        # skip = 0
-        # while i >= 0:
-        payload = {
-                'action': 'process',
-                'tagtype_0': 'countries',
-                'tag_contains_0': 'contains',
-                'tag_0': 'France',
-                'tagtype_1': 'categories',
-                'tag_contains_1': 'contains',
-                'tag_1': category.name,
-                'json': 'true',
-                'page_size': page_size,
-                # 'page': 1 + skip//page_size,
-                'sort_by': 'unique_scans_n'
-                }
-        r = requests.get(url=URL_PRODUCTS, params=payload)
-        clean_products = self.clean_products(r.json())
-        self.add_product_to_db(clean_products, db, category.off_id)
-            # skip += page_size
-            # i = int(r.json()['count']) - skip
-
-    def clean_products(self, products):
-        """
-        Method to clean products which do not have specific keys,
-        contained in keys[].
-        """
-        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands']
-        for i in range(len(products['products'])):
-            for j in range(len(keys)):
-                try:
-                    buf = products['products'][i][keys[j]]
-                except KeyError:
-                    products['products'][i][keys[j]] = ''
-        return products
-
-    def add_product_to_db(self, products, db, category):
-        """
-        Add products to the local database.
-        Stores the relationship between product and category
-        in the local database.
-        Stores the relationship between product and brands in
-        the local database
-
-        products -- json of products to be added
-        db -- DatabaseService object
-        category -- str being the Open Food Facts id of a category
-        """
-        for i in range(len(products['products'])):
-            add_product = {
-                'barcode': products['products'][i]['code'],
-                'name_fr': products['products'][i]['product_name_fr'],
-                'generic_name': products['products'][i]['generic_name'],
-                'nutrition_grade_fr': products['products'][i]['nutrition_grade_fr'],
-                'url': products['products'][i]['url']
-            }
-
-            with db.cnx.cursor() as cursor:
-                cursor.execute(queries.insert_product, add_product)  
-                last_product_id = cursor.lastrowid
-                add_product_category = {
-                    'product_id': last_product_id,
-                    'category': category,
-                }
-                cursor.execute(queries.insert_product_category, add_product_category)
-                brands = products['products'][i]['brands'].split(',') 
-
-                for j in range(len(brands)):
-                    add_product_brand = {
-                        'product_id': last_product_id,
-                        'brand': brands[j]
-                    }
-                    cursor.execute(queries.insert_product_brand, add_product_brand)
-
-        db.cnx.commit()
 
 
 class DatabaseService():
