@@ -8,6 +8,10 @@ class Product():
     def __init__(self, id, name):
         self.id = id
         self.name = name
+        self.nutrition_grade = 'not available yet'
+        self.url = 'not available yet'
+        self.brands = 'not available yet'
+        self.stores = 'not available yet'
 
     def get_product_details(self):
         """

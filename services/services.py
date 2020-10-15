@@ -156,7 +156,7 @@ class BrandService():
 class ProductService():
 
     def __init__(self):
-        pass
+        self.products = []
 
     def get_products(self, db, cat_service, category):
         """
@@ -164,16 +164,14 @@ class ProductService():
         If yes, returns a list of Product objects.
         If no, gets the product from OFF.
         """
-        products = []
         with db.cnx.cursor(buffered=True) as cursor:
             cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
                 for (id, name) in cursor.fetchall():
-                    products.append(product.Product(id = id, name = name))
+                    self.products.append(product.Product(id = id, name = name))
             else:
                 self.get_products_from_off(db, cat_service, category)
                 return self.get_products(db, cat_service, category)
-        return products
 
     def get_products_from_off(self, db, cat_service, category):
         """

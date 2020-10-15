@@ -38,7 +38,7 @@ class TUI():
         choice = input('\nChoisissez une catégorie : ')
         return(categories[int(choice) - 1])
 
-    def select_product(self, products):            
+    def select_product(self, products):
         os.system('clear')
         t = PrettyTable(['Choix', 'Produit'])
         t.align = 'l'
@@ -50,13 +50,14 @@ class TUI():
         return(products[int(choice) - 1])
 
     def display_product_details(self, product):
-        print('Nom : {}\nNutri-score : {}'.format(product.name, product.nutrition_score.upper()))
         os.system('clear')
         t = PrettyTable(['Détails du produit',''])
         t.align = 'l'
         t.vrules = NONE
+        t.add_row(['Marques', product.brands])
         t.add_row(['Nom', product.name])
-        t.add_row(['Nutri score', product.nutrition_score.upper()])
+        t.add_row(['Nutri score', product.nutrition_grade])
+        t.add_row(['Magasins proposant ce produit', product.stores])
         t.add_row(['+ d\'infos', product.url])
         print(t)
 
