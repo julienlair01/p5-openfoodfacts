@@ -1,5 +1,5 @@
 # coding: utf-8
-""" This module manages the user interface class. """
+""" This module manages the terminal user interface class. """
 
 import os
 from prettytable import PrettyTable
@@ -7,21 +7,7 @@ from prettytable import NONE
 from pprint import pprint
 
 
-WELCOME = '''
-----------------------
-       Bienvenue
-----------------------
-
-1. Trouver un substitut à un produit
-2. Voir mes favoris
-
-'''
-
-SELECT = '''
-Faîtes un choix parmi :
-'''
-
-class UI():
+class TUI():
 
     def __init__(self):
         pass
@@ -33,18 +19,22 @@ class UI():
         choice = ''
         while (choice not in ['1','2']):
             os.system('clear')
-            print(WELCOME)
+            print('welcome')
             choice = input('Quel est votre choix ? ')
         
         if choice == '1':
-            return(self.choose_category(categories))
+            return(self.select_category(categories))
         elif choice == '2':
             self.choose_favorite()
 
-    def choose_category(self, categories):
-        print(SELECT)
+    def select_category(self, categories):
+        os.system('clear')
+        t = PrettyTable(['Choix', 'Categorie'])
+        t.align = 'l'
+        t.vrules = NONE
         for index, value in enumerate(categories):
-            print(index+1, '-', categories[index].name)
+            t.add_row([index+1, categories[index].name])
+        print(t)
         choice = input('\nChoisissez une catégorie : ')
         return(categories[int(choice) - 1])
 
@@ -70,7 +60,5 @@ class UI():
         t.add_row(['+ d\'infos', product.url])
         print(t)
 
-
-            
     def choose_favorite(self):
         pass

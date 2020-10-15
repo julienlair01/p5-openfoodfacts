@@ -37,6 +37,8 @@ get_categories = ("SELECT id, name, off_id FROM Category "
                     "ORDER BY name "
                     "LIMIT 10")
 
+count_brands = ("SELECT COUNT(*) as total FROM Brand")
+
 get_category_off_id = ("SELECT off_id FROM Category "
                     "WHERE id = %(id)s")
 
