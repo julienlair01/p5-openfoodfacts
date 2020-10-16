@@ -27,6 +27,15 @@ CREATE TABLE IF NOT EXISTS Brand (
 )
 ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS Store (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    off_id VARCHAR(250) NOT NULL,
+    name VARCHAR(250),
+    PRIMARY KEY (id),
+    UNIQUE KEY off_id (off_id)
+)
+ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS Product_category (
     product_id INT UNSIGNED NOT NULL,
     category_id INT UNSIGNED NOT NULL,
@@ -52,6 +61,20 @@ CREATE TABLE IF NOT EXISTS Product_brand (
     CONSTRAINT fk_brand_prod_id
         FOREIGN KEY (brand_id)
         REFERENCES Brand(id)
+)
+ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS Product_store (
+    product_id INT UNSIGNED NOT NULL,
+    store_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (product_id, store_id),
+    UNIQUE KEY product_store (product_id, store_id),
+    CONSTRAINT fk_product_store_id
+        FOREIGN KEY (product_id)
+        REFERENCES Product(id),
+    CONSTRAINT fk_store_prod_id
+        FOREIGN KEY (store_id)
+        REFERENCES Store(id)
 )
 ENGINE=InnoDB;
 

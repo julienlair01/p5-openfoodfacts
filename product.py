@@ -15,7 +15,7 @@ class Product():
         self.nutrition_grade = nutrition_grade.upper()
         self.url = url
         self.barcode = barcode
-        self.brands = self.get_product_brands(db)
+        self.brands = self.get_product_brands()
         self.stores = 'not available yet'
 
     def get_product_brands(self):
@@ -32,7 +32,7 @@ class Product():
                 b.append(name)
             return ', '.join(b)
 
-    def insert_product_into_local(self, category, brands):
+    def insert_product_into_local(self, category, brands, stores):
         """
         Insert a product into the local database.
         Stores the relationship between product and category
@@ -54,17 +54,8 @@ class Product():
             last_product_id = cursor.lastrowid
             self.save_product_category(cursor, category, last_product_id)
             self.save_product_brand(cursor, brands, last_product_id)
+            self.save_product_store(cursor, stores, last_product_id)
         self.db.cnx.commit()
-
-    def save_product_brand(self, cursor, brands, last_product_id):
-        buf_brands = brands.split(',') 
-        print(brands, buf_brands)
-        for j in range(len(buf_brands)):
-            add_product_brand = {
-                'product_id': last_product_id,
-                'brand': buf_brands[j]
-            }
-            cursor.execute(queries.insert_product_brand, add_product_brand)
 
     def save_product_category(self, cursor, category, last_product_id):
         add_product_category = {
@@ -72,7 +63,25 @@ class Product():
                 'category': category.off_id,
             }
         cursor.execute(queries.insert_product_category, add_product_category)
-        
+
+    def save_product_brand(self, cursor, brands, last_product_id):
+        buf_brands = brands.split(',') 
+        for j in range(len(buf_brands)):
+            add_product_brand = {
+                'product_id': last_product_id,
+                'brand': buf_brands[j]
+            }
+            cursor.execute(queries.insert_product_brand, add_product_brand)
+
+    def save_product_store(self, cursor, stores, last_product_id):
+        buf_stores = stores.split(',') 
+        print('Store :', stores, buf_stores)
+        for j in range(len(buf_stores)):
+            add_product_store = {
+                'product_id': last_product_id,
+                'store': buf_stores[j]
+            }
+            cursor.execute(queries.insert_product_store, add_product_store)
 
     def find_substitute(self):
         pass

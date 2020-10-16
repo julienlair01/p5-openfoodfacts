@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS Product_category, Product_brand, Product_substitute, User_favorite_product, Category, Brand, Product;
+DROP TABLE IF EXISTS Product_category, Product_brand, Product_store, Product_substitute, User_favorite_product, Category, Store, Brand, Product;

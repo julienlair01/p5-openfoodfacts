@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """ This module contains the Services classes.
     It manages everything related to the Products, 
     Categories and the Database connection. """
@@ -60,7 +62,8 @@ class ProductService():
                 'json': 'true',
                 'page_size': page_size,
                 # 'page': 1 + skip//page_size,
-                'sort_by': 'unique_scans_n'
+                'sort_by': 'unique_scans_n',
+                'User-Agent': 'Python - find a substitute - desktop'
                 }
         r = requests.get(url=URL_PRODUCTS, params=payload)
         clean_products = self.clean_products(r.json())
@@ -73,7 +76,7 @@ class ProductService():
                                     url= clean_products['products'][i]['url'],
                                     barcode= clean_products['products'][i]['code']
                                     )
-            p_buf.insert_product_into_local(category, brands= clean_products['products'][i]['brands'])
+            p_buf.insert_product_into_local(category, brands= clean_products['products'][i]['brands'], stores= clean_products['products'][i]['stores'])
 
     def clean_products(self, products):
         """

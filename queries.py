@@ -19,6 +19,12 @@ insert_product_brand = ("INSERT IGNORE INTO Product_brand ("
                                     ") "
                                 "VALUES (%(product_id)s, (SELECT id FROM Brand WHERE off_id = %(brand)s))")
 
+insert_product_store = ("INSERT IGNORE INTO Product_store ("
+                                    "product_id, "
+                                    "store_id"
+                                    ") "
+                                "VALUES (%(product_id)s, (SELECT id FROM Store WHERE off_id = %(store)s))")
+
 insert_product_substitute = ("INSERT INTO Product_has_substitute ("
                                     "product_id, "
                                     "substitute_id"

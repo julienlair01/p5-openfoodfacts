@@ -3,7 +3,7 @@
 
 """
 
-from services import services, productservice
+from services import services, productservice, categoryservice, databaseservice, brandservice
 import tui
 import product
 
@@ -13,9 +13,9 @@ from pprint import pprint
 class App():
 
     def __init__(self):
-        self.db_service = services.DatabaseService()
-        self.cat_service = services.CategoryService(self.db_service)
-        self.brand_service = services.BrandService(self.db_service)
+        self.db_service = databaseservice.DatabaseService()
+        self.cat_service = categoryservice.CategoryService(self.db_service)
+        self.brand_service = brandservice.BrandService(self.db_service)
         self.product_service = productservice.ProductService(self.db_service)
         self.tui = tui.TUI()
         
