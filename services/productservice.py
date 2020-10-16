@@ -39,7 +39,6 @@ class ProductService():
                 return self.load_products(cat_service, category)
         self.db.disconnect_from_db()
 
-
     def load_products_from_off(self, cat_service, category):
         """
         Retrieve the list of products of a given category, from
@@ -51,9 +50,6 @@ class ProductService():
         """
         print('Veuillez patienter, nous téléchargeons les produits...')
         page_size = 20
-        # i = 0
-        # skip = 0
-        # while i >= 0:
         payload = {
                 'action': 'process',
                 'tagtype_0': 'countries',
@@ -64,7 +60,6 @@ class ProductService():
                 'tag_1': category.name,
                 'json': 'true',
                 'page_size': page_size,
-                # 'page': 1 + skip//page_size,
                 'sort_by': 'unique_scans_n',
                 'User-Agent': 'Python - find a substitute - desktop'
                 }

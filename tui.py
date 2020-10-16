@@ -10,7 +10,7 @@ from pprint import pprint
 class TUI():
 
     def __init__(self):
-        pass
+        self.menu_choices = ['Trouver un substitut sain à un produit', 'Voir les produits sauvegardés', 'Quitter']
 
     def menu_logic(self):
         pass
@@ -19,11 +19,14 @@ class TUI():
         choice = ''
         os.system('clear')
         while choice not in [1,2]:
-            print('''Bienvenue !
-1 - Trouver un subsitut plus sain à produit
-2 - Voir la liste de mes favoris\n'''
-                )       
-            choice = input('Quel est votre choix ? ')
+            t = PrettyTable(['Choix', ''])
+            t.align = 'l'
+            t.vrules = NONE
+            for index, value in enumerate(self.menu_choices):
+                t.add_row([index+1, value])
+            print(t)
+            choice = input('\nQue shouhaitez-vous faire ? ')
+
             if choice == '1':
                 return(self.select_category(categories))
             elif choice == '2':
