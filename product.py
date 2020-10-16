@@ -81,6 +81,7 @@ class Product():
                 'product_id': last_product_id,
                 'brand': buf_brands[j]
             }
+            cursor.execute(queries.insert_brand, (buf_brands[j],))
             cursor.execute(queries.insert_product_brand, add_product_brand)
 
     def save_product_store(self, cursor, stores, last_product_id):

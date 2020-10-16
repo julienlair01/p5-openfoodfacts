@@ -24,7 +24,7 @@ class CategoryService():
 
     def load_categories(self, db):
         """
-        Get categories, from local db if they exist,
+        Load categories, from local db if they exist,
         or from Open Food Facts if they do not.
         List Caterogy object in categories[]
         
@@ -46,7 +46,15 @@ class CategoryService():
         """
         cat_json  = requests.get('https://fr.openfoodfacts.org/categories.json').json()
         print('OK...Categories retrieved from Open Food Facts.') 
-        self.update_categories_in_db(db, cat_json)
+        for i in range(len(cat_json['tags'])):
+            if cat_json['tags'][i]['name'] in self.filter_categories:
+                c_buf = category.Category(
+                    db = self.db,
+                    name = cat_json['tags'][i]['name'],
+                    off_id = cat_json['tags'][i]['id']
+                )
+                c_buf.insert_category_into_local()
+        print('OK...Inserted categories into db.')
 
     def load_categories_from_local(self, db):
         """
@@ -60,23 +68,5 @@ class CategoryService():
             cursor.execute(queries.get_categories)
             if cursor.rowcount > 0:
                 for (id, name, off_id) in cursor:
-                    self.categories.append(category.Category(id, name, off_id))
+                    self.categories.append(category.Category(db= self.db, id= id, name= name, off_id= off_id))
         db.disconnect_from_db()
-
-    def update_categories_in_db(self, db, cat_json):
-        """
-        Writes new categories in the local database.
-        db -- Database object
-        cat_json -- json file containing categories to insert into local db
-        """
-        db.connect_to_db()
-        with db.cnx.cursor() as cursor:
-            for i in range(len(cat_json['tags'])):
-                if cat_json['tags'][i]['name'] in self.filter_categories:
-                    add_category = {
-                        'off_id': cat_json['tags'][i]['id'],
-                        'name': cat_json['tags'][i]['name']
-                    }
-                    cursor.execute(queries.insert_category, add_category)
-        db.cnx.commit()
-        print('OK...Inserted categories into db.')

@@ -29,6 +29,7 @@ class ProductService():
         self.db.connect_to_db()
         # faire le count
         with self.db.cnx.cursor(buffered=True) as cursor:
+            print(category.id, category.name)
             cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
                 for (id, name, nutrition_grade_fr, url, barcode) in cursor.fetchall():
@@ -48,7 +49,7 @@ class ProductService():
         cat_service -- CategoryService object
         category_id -- id of the category to get products from
         """
-        print('Veuillez patienter, nous téléchargeons les produits...')
+        print('Veuillez patienter, nous téléchargeons les produits...', category.name)
         page_size = 20
         payload = {
                 'action': 'process',
