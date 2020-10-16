@@ -16,14 +16,12 @@ class Product():
         self.url = url
         self.barcode = barcode
         self.brands = self.get_product_brands()
-        self.stores = 'not available yet'
+        self.stores = self.get_product_stores()
 
     def get_product_brands(self):
         """
         Get product brands. Returns a string, 
         concatenating all product brands.
-
-        db -- DatabaseService object
         """
         with self.db.cnx.cursor(buffered=True) as cursor:
             cursor.execute(queries.get_product_brands, {'id': self.id})
@@ -31,6 +29,18 @@ class Product():
             for (name, ) in cursor:
                 b.append(name)
             return ', '.join(b)
+
+    def get_product_stores(self):
+        """
+        Get product stores. Returns a string, 
+        concatenating all product stores.
+        """
+        with self.db.cnx.cursor(buffered=True) as cursor:
+            cursor.execute(queries.get_product_stores, {'id': self.id})
+            s = []
+            for (name, ) in cursor:
+                s.append(name)
+            return ', '.join(s)
 
     def insert_product_into_local(self, category, brands, stores):
         """
@@ -75,12 +85,12 @@ class Product():
 
     def save_product_store(self, cursor, stores, last_product_id):
         buf_stores = stores.split(',') 
-        print('Store :', stores, buf_stores)
         for j in range(len(buf_stores)):
             add_product_store = {
                 'product_id': last_product_id,
                 'store': buf_stores[j]
             }
+            cursor.execute(queries.insert_store, (buf_stores[j],))
             cursor.execute(queries.insert_product_store, add_product_store)
 
     def find_substitute(self):

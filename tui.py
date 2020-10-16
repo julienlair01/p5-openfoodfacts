@@ -61,7 +61,7 @@ class TUI():
         t.add_row(['Marques', product.brands])
         t.add_row(['Nom', product.name])
         t.add_row(['Nutri score', product.nutrition_grade])
-        t.add_row(['Magasins proposant ce produit', product.stores])
+        t.add_row(['Distributeurs', product.stores])
         t.add_row(['+ d\'infos', product.url])
         print(t)
 

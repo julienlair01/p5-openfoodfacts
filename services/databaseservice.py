@@ -17,7 +17,7 @@ DB_CONFIG = {
                 }
 INIT_TABLES_FILE = '/Users/julienlair/Formation_Python/projet5/app/create_tables.sql'
 CLEAR_DATA_FILE = '/Users/julienlair/Formation_Python/projet5/app/drop_tables.sql'
-DROP_TABLES = False
+DROP_TABLES = True
 
 
 class DatabaseService():

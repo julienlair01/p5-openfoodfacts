@@ -20,19 +20,17 @@ ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Brand (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    off_id VARCHAR(250) NOT NULL,
     name VARCHAR(250),
     PRIMARY KEY (id),
-    UNIQUE KEY off_id (off_id)
+    UNIQUE KEY name (name)
 )
 ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Store (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    off_id VARCHAR(250) NOT NULL,
     name VARCHAR(250),
     PRIMARY KEY (id),
-    UNIQUE KEY off_id (off_id)
+    UNIQUE KEY off_id (name)
 )
 ENGINE=InnoDB;
 

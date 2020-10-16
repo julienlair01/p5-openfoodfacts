@@ -1,11 +1,14 @@
 insert_category = ("INSERT IGNORE INTO Category (off_id, name) "
                     "VALUES (%(off_id)s, %(name)s)")
 
-insert_brand = ("INSERT IGNORE INTO Brand (off_id, name) "
-                    "VALUES (%(off_id)s, %(name)s)")
+insert_brand = ("INSERT IGNORE INTO Brand (name) "
+                    "VALUES (%s)")
 
 insert_product = ("INSERT IGNORE INTO Product (barcode, name_fr, nutrition_grade_fr, url) "
                     "VALUES (%(barcode)s, %(name_fr)s, %(nutrition_grade_fr)s, %(url)s)")
+
+insert_store = ("INSERT IGNORE INTO Store (name) "
+                    "VALUES (%s)")
 
 insert_product_category = ("INSERT IGNORE INTO Product_category ("
                                     "product_id, "
@@ -17,13 +20,13 @@ insert_product_brand = ("INSERT IGNORE INTO Product_brand ("
                                     "product_id, "
                                     "brand_id"
                                     ") "
-                                "VALUES (%(product_id)s, (SELECT id FROM Brand WHERE off_id = %(brand)s))")
+                                "VALUES (%(product_id)s, (SELECT id FROM Brand WHERE name = %(brand)s))")
 
 insert_product_store = ("INSERT IGNORE INTO Product_store ("
                                     "product_id, "
                                     "store_id"
                                     ") "
-                                "VALUES (%(product_id)s, (SELECT id FROM Store WHERE off_id = %(store)s))")
+                                "VALUES (%(product_id)s, (SELECT id FROM Store WHERE name = %(store)s))")
 
 insert_product_substitute = ("INSERT INTO Product_has_substitute ("
                                     "product_id, "
@@ -63,3 +66,8 @@ get_product_details = ("SELECT barcode, name_fr, nutrition_grade_fr, url, b.name
                         "INNER JOIN Product_brand pb ON pc.product_id = pb.product_id "
                         "INNER JOIN Brand b ON pb.brand_id = b.id "
                         "WHERE p.id = %(id)s")
+
+get_product_stores = ("SELECT s.name as 'store name' FROM Store s "
+                    "INNER JOIN Product_store ps ON ps.store_id = s.id "
+                    "INNER JOIN Product p ON p.id = ps.product_id "
+                    "WHERE p.id = %(id)s")

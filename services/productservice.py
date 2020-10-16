@@ -26,7 +26,7 @@ class ProductService():
         If yes, returns a list of Product objects.
         If no, loads the products from Open Food Facts API.
         """
-
+        self.db.connect_to_db()
         # faire le count
         with self.db.cnx.cursor(buffered=True) as cursor:
             cursor.execute(queries.get_products, {'cat_id': category.id})
@@ -35,7 +35,10 @@ class ProductService():
                     self.products.append(product.Product(self.db, id= id, name= name, nutrition_grade= nutrition_grade_fr, url= url, barcode= barcode))
             else:
                 self.load_products_from_off(cat_service, category)
+                cursor.close()
                 return self.load_products(cat_service, category)
+        self.db.disconnect_from_db()
+
 
     def load_products_from_off(self, cat_service, category):
         """
@@ -83,7 +86,7 @@ class ProductService():
         Method to clean products which do not have specific keys,
         contained in keys[].
         """
-        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands']
+        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands', 'stores']
         for i in range(len(products['products'])):
             for j in range(len(keys)):
                 try:

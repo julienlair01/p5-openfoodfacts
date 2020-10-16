@@ -11,7 +11,8 @@ import requests
 class BrandService():
     
     def __init__(self, db):
-        self.get_brands(db)
+        pass
+        # self.get_brands(db)
 
     def get_brands(self, db):
         """
@@ -58,17 +59,6 @@ class BrandService():
         db.connect_to_db()
         with db.cnx.cursor() as cursor:
             for i in range(len(brands_json['tags'])):
-                add_brand = {
-                    'off_id': brands_json['tags'][i]['id'],
-                    'name': brands_json['tags'][i]['name']
-                }
-                cursor.execute(queries.insert_brand, add_brand)
+                cursor.execute(queries.insert_brand, (brands_json['tags'][i]['name'],))
         db.cnx.commit()
         print('OK...Inserted brands into db.')
-
-
-        with open(CLEAR_DATA_FILE, 'r') as f:
-            with self.cnx.cursor() as cursor:
-                cursor.execute(f.read(), multi=True)
-                self.cnx.commit()
-        print('OK...Tables dropped.')

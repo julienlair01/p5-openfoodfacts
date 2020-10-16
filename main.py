@@ -3,7 +3,7 @@
 
 """
 
-from services import services, productservice, categoryservice, databaseservice, brandservice
+from services import productservice, categoryservice, databaseservice, brandservice
 import tui
 import product
 
