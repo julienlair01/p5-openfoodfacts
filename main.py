@@ -21,7 +21,6 @@ class App():
         
     def main_logic(self):
         chosen_category = self.tui.show_menu(self.cat_service.categories)
-        print('chosen:', chosen_category)
         self.product_service.load_products(self.cat_service, chosen_category)
         chosen_product = self.tui.select_product(self.product_service.products)
         self.tui.display_product_details(chosen_product)

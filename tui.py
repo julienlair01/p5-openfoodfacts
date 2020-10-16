@@ -3,7 +3,7 @@
 
 import os
 from prettytable import PrettyTable
-from prettytable import NONE
+from prettytable import NONE, ALL
 from pprint import pprint
 
 
@@ -47,18 +47,19 @@ class TUI():
 
     def select_product(self, products):
         os.system('clear')
-        t = PrettyTable(['Choix', 'Produit', 'Marques'])
+        t = PrettyTable(['Choix', 'Produit', 'Marques', 'Nutri-score'])
         t.align = 'l'
+        t.align['Nutri-score'] = 'c'
         t.vrules = NONE
         for index, value in enumerate(products):
-            t.add_row([index+1, products[index].name, products[index].brands])
+            t.add_row([index+1, products[index].name, products[index].brands, products[index].nutrition_grade.upper()])
         print(t)
         choice = input('\nChoisissez un produit : ')
         return(products[int(choice) - 1])
 
     def display_product_details(self, product):
         os.system('clear')
-        t = PrettyTable(['Détails du produit',''])
+        t = PrettyTable(['Détails du produit sélectionné',''])
         t.align = 'l'
         t.vrules = NONE
         t.add_row(['Marques', product.brands])
