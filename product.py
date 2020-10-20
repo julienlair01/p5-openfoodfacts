@@ -15,8 +15,21 @@ class Product():
         self.nutrition_grade = nutrition_grade.upper()
         self.url = url
         self.barcode = barcode
+        self.categories = self.get_product_categories()
         self.brands = self.get_product_brands()
         self.stores = self.get_product_stores()
+
+    def get_product_categories(self):
+        """
+        Get product categories. Returns a string, 
+        concatenating all product categories.
+        """
+        with self.db.cnx.cursor(buffered=True) as cursor:
+            cursor.execute(queries.get_product_categories, {'id': self.id})
+            c = []
+            for (name, ) in cursor:
+                c.append(name)
+            return ', '.join(c)
 
     def get_product_brands(self):
         """
@@ -42,7 +55,7 @@ class Product():
                 s.append(name)
             return ', '.join(s)
 
-    def insert_product_into_local(self, category, brands, stores):
+    def insert_product_into_local(self, categories, brands, stores):
         """
         Insert a product into the local database.
         Stores the relationship between product and category
@@ -50,7 +63,7 @@ class Product():
         Stores the relationship between product and brands in
         the local database
 
-        category -- Category object
+        categories -- Category object
         brands -- str with all product brands
         """
         add_product = {
@@ -62,17 +75,21 @@ class Product():
         with self.db.cnx.cursor() as cursor:
             cursor.execute(queries.insert_product, add_product)  
             last_product_id = cursor.lastrowid
-            self.save_product_category(cursor, category, last_product_id)
+            self.save_product_category(cursor, categories, last_product_id)
             self.save_product_brand(cursor, brands, last_product_id)
             self.save_product_store(cursor, stores, last_product_id)
         self.db.cnx.commit()
 
-    def save_product_category(self, cursor, category, last_product_id):
-        add_product_category = {
-                'product_id': last_product_id,
-                'category': category.off_id,
-            }
-        cursor.execute(queries.insert_product_category, add_product_category)
+    def save_product_category(self, cursor, categories_tags, last_product_id):
+        buf_categories = []
+        [buf_categories.append(value) for value in categories_tags]
+        for i in range(len(buf_categories)):
+            add_product_category = {
+                    'product_id': last_product_id,
+                    'category': buf_categories[i]
+                }
+            print('inserting',buf_categories, '-', buf_categories[i])
+            cursor.execute(queries.insert_product_category, add_product_category)
 
     def save_product_brand(self, cursor, brands, last_product_id):
         buf_brands = brands.split(',') 
@@ -95,5 +112,9 @@ class Product():
             cursor.execute(queries.insert_product_store, add_product_store)
 
     def find_substitute(self):
+        """
+        Method to find a substitute to the given product.
+        """
+        
         pass
 

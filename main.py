@@ -20,9 +20,10 @@ class App():
         self.tui = tui.TUI()
         
     def main_logic(self):
-        chosen_category = self.tui.show_menu(self.cat_service.categories)
+        chosen_category = self.tui.show_menu(self.cat_service.main_categories)
         self.product_service.load_products(self.cat_service, chosen_category)
         chosen_product = self.tui.select_product(self.product_service.products)
+        chosen_product.find_substitute()
         self.tui.display_product_details(chosen_product)
 
 app = App()

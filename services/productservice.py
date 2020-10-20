@@ -75,7 +75,7 @@ class ProductService():
                                     url= clean_products['products'][i]['url'],
                                     barcode= clean_products['products'][i]['code']
                                     )
-            p_buf.insert_product_into_local(category, brands= clean_products['products'][i]['brands'], stores= clean_products['products'][i]['stores'])
+            p_buf.insert_product_into_local(categories= clean_products['products'][i]['categories_tags'], brands= clean_products['products'][i]['brands'], stores= clean_products['products'][i]['stores'])
 
     def clean_products(self, products):
         """

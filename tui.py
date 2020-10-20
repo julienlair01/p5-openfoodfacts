@@ -62,6 +62,7 @@ class TUI():
         t = PrettyTable(['Détails du produit sélectionné',''])
         t.align = 'l'
         t.vrules = NONE
+        t.add_row(['Catégories', product.categories])
         t.add_row(['Marques', product.brands])
         t.add_row(['Nom', product.name])
         t.add_row(['Nutri score', product.nutrition_grade])

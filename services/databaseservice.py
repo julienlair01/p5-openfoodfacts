@@ -17,7 +17,7 @@ DB_CONFIG = {
                 }
 INIT_TABLES_FILE = '/Users/julienlair/Formation_Python/projet5/app/create_tables.sql'
 CLEAR_DATA_FILE = '/Users/julienlair/Formation_Python/projet5/app/drop_tables.sql'
-DROP_TABLES = True
+RESET_TABLES = False
 
 
 class DatabaseService():
@@ -25,7 +25,7 @@ class DatabaseService():
     def __init__(self):
         self.config = DB_CONFIG
         self.connect_to_db()
-        if DROP_TABLES:
+        if RESET_TABLES:
             self.drop_tables()
         self.create_tables()
         self.disconnect_from_db()

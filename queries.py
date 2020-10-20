@@ -10,7 +10,7 @@ insert_product = ("INSERT IGNORE INTO Product (barcode, name_fr, nutrition_grade
 insert_store = ("INSERT IGNORE INTO Store (name) "
                     "VALUES (%s)")
 
-insert_product_category = ("INSERT IGNORE INTO Product_category ("
+insert_product_category = ("INSERT INTO Product_category ("
                                     "product_id, "
                                     "category_id"
                                     ") "
@@ -54,6 +54,11 @@ get_products = ("SELECT p.id, p.name_fr, p.nutrition_grade_fr, p.url, p.barcode 
                 "INNER JOIN Product_category pc ON p.id = pc.product_id "
                 "WHERE pc.category_id = %(cat_id)s AND p.name_fr != '' "
                 "ORDER BY p.name_fr ASC")
+
+get_product_categories = ("SELECT c.name as 'category name' FROM Category c "
+                    "INNER JOIN Product_category pc ON pc.category_id = c.id "
+                    "INNER JOIN Product p ON p.id = pc.product_id "
+                    "WHERE p.id = %(id)s")
 
 get_product_brands = ("SELECT b.name as 'brand name' FROM Brand b "
                     "INNER JOIN Product_brand pb ON pb.brand_id = b.id "
