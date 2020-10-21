@@ -124,13 +124,8 @@ class Product():
         """
         substitutes=[]
         test_list1 = []
-        self.db.connect_to_db()
-        # should be using get_product_categories but I am having an issue
-        with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
-            cursor.execute(queries.get_product_categories, {'id': self.id})
-            for result in cursor:
-                test_list1.append(result['category name'])
 
+        self.db.connect_to_db()
         with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
             cursor.execute(queries.find_substitute, {'id': self.id})
             if cursor.rowcount == 0:
@@ -140,11 +135,9 @@ class Product():
                     test_list2 = []
                     with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
                         cursor.execute(queries.get_product_categories, {'id': id['id']})
-                        for result in cursor:
-                            test_list2.append(result['category name'])
-                    score = len(set(test_list1) & set(test_list2)) / float(len(set(test_list1) | set(test_list2))) * 100
+                        [test_list2.append(result['category name']) for result in cursor]
+                    score = len(set(self.categories) & set(','.join(test_list2))) / float(len(set(self.categories) | set(','.join(test_list2)))) * 100
                     if score >= 50:
                         self.save_product_substitute(id['id'], score)
-
         self.db.disconnect_from_db()
 
