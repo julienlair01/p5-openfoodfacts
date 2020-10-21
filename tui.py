@@ -45,17 +45,27 @@ class TUI():
     def select_product(self, products):
         choice = 'S'
         min = 0
-        while choice in ('S'):
+        while choice in ('P', 'S'):
             os.system('clear')
             t = PrettyTable(['Choix', 'Produit', 'Marques', 'Nutri-score'], **self.table_style)
-            for index in range(min, min+20):
-                t.add_row([index+1, products[index].name, products[index].brands, products[index].nutrition_grade.upper()])
-            t.add_row(['', '','',''])
-            t.add_row(['S', 'page suivante','',''])
+            
+            if min >= 20:
+                t.add_row(['P', 'Page précédente','',''])
+                t.add_row(['', '','',''])
+            try:
+                for index in range(min, min+20):
+                    t.add_row([index+1, products[index].name, products[index].brands, products[index].nutrition_grade.upper()])
+            except IndexError:
+                pass
+            if (min + 20) < len(products):
+                t.add_row(['', '','',''])
+                t.add_row(['S', 'Page suivante','',''])
             print(t)
             choice = input('\nChoisissez un produit : ').upper()
             if choice == 'S':
                 min += 20
+            elif choice == 'P':
+                min -= 20
         return(products[int(choice) - 1])
 
     def display_product_details(self, product):
@@ -63,7 +73,6 @@ class TUI():
         t = PrettyTable(['Détails du produit sélectionné',''], **self.table_style)
         t.add_row(['Marques', product.brands])
         t.add_row(['Nom', product.name])
-        t.add_row(['Catégories', product.categories])
         t.add_row(['Nutri score', product.nutrition_grade])
         t.add_row(['Distributeurs', product.stores])
         t.add_row(['+ d\'infos', product.url])
