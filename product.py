@@ -5,6 +5,7 @@
 import queries
 
 import mysql.connector
+from pprint import pprint
 
 class Product():
 
@@ -88,7 +89,6 @@ class Product():
                     'product_id': last_product_id,
                     'category': buf_categories[i]
                 }
-            print('inserting',buf_categories, '-', buf_categories[i])
             cursor.execute(queries.insert_product_category, add_product_category)
 
     def save_product_brand(self, cursor, brands, last_product_id):
@@ -110,11 +110,41 @@ class Product():
             }
             cursor.execute(queries.insert_store, (buf_stores[j],))
             cursor.execute(queries.insert_product_store, add_product_store)
+    
+    def save_product_substitute(self, substitute_id, score):
+        with self.db.cnx.cursor(buffered=True) as cursor:
+            cursor.execute(queries.insert_product_substitute, {'product_id': self.id, 'substitute_id': substitute_id, 'score': score})
+            self.db.cnx.commit()
 
     def find_substitute(self):
         """
         Method to find a substitute to the given product.
+        Finds all products with one category in common and 
+        best possible nutrition grade.
         """
-        
-        pass
+        substitutes=[]
+        test_list1 = []
+        self.db.connect_to_db()
+        # should be using get_product_categories but I am having an issue
+        with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
+            cursor.execute(queries.get_product_categories, {'id': self.id})
+            for result in cursor:
+                test_list1.append(result['category name'])
+
+        with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
+            cursor.execute(queries.find_substitute, {'id': self.id})
+            if cursor.rowcount == 0:
+                print("no substitute found")
+            else:
+                for id in cursor:
+                    test_list2 = []
+                    with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
+                        cursor.execute(queries.get_product_categories, {'id': id['id']})
+                        for result in cursor:
+                            test_list2.append(result['category name'])
+                    score = len(set(test_list1) & set(test_list2)) / float(len(set(test_list1) | set(test_list2))) * 100
+                    if score >= 50:
+                        self.save_product_substitute(id['id'], score)
+
+        self.db.disconnect_from_db()
 

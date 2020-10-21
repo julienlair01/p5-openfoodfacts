@@ -25,6 +25,7 @@ class App():
         chosen_product = self.tui.select_product(self.product_service.products)
         chosen_product.find_substitute()
         self.tui.display_product_details(chosen_product)
+        chosen_product.find_substitute()
 
 app = App()
 app.main_logic()

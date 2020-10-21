@@ -10,7 +10,7 @@ insert_product = ("INSERT IGNORE INTO Product (barcode, name_fr, nutrition_grade
 insert_store = ("INSERT IGNORE INTO Store (name) "
                     "VALUES (%s)")
 
-insert_product_category = ("INSERT INTO Product_category ("
+insert_product_category = ("INSERT IGNORE INTO Product_category ("
                                     "product_id, "
                                     "category_id"
                                     ") "
@@ -28,13 +28,15 @@ insert_product_store = ("INSERT IGNORE INTO Product_store ("
                                     ") "
                                 "VALUES (%(product_id)s, (SELECT id FROM Store WHERE name = %(store)s))")
 
-insert_product_substitute = ("INSERT INTO Product_has_substitute ("
+insert_product_substitute = ("INSERT IGNORE INTO Product_substitute ("
                                     "product_id, "
-                                    "substitute_id"
+                                    "substitute_id, "
+                                    "score"
                                 ")"
                                 "VALUES ("
                                     "%(product_id)s, "
-                                    "%(substitute_id)s"
+                                    "%(substitute_id)s, "
+                                    "%(score)s"
                                 ")")
 
 insert_user_favorite_product = ("INSERT INTO User_favorite_product (product_id) "
@@ -76,3 +78,8 @@ get_product_stores = ("SELECT s.name as 'store name' FROM Store s "
                     "INNER JOIN Product_store ps ON ps.store_id = s.id "
                     "INNER JOIN Product p ON p.id = ps.product_id "
                     "WHERE p.id = %(id)s")
+
+find_substitute = ( "SELECT p.id FROM Product p "
+                    "WHERE p.nutrition_grade_fr != '' "
+                    "AND p.nutrition_grade_fr < (SELECT p2.nutrition_grade_fr FROM Product p2 WHERE p2.id = %(id)s) "
+                    "ORDER BY p.nutrition_grade_fr ")
