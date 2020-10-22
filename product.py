@@ -116,7 +116,7 @@ class Product():
             cursor.execute(queries.insert_product_substitute, {'product_id': self.id, 'substitute_id': substitute_id, 'score': score})
             self.db.cnx.commit()
 
-    def find_substitute(self):
+    def find_substitutes(self):
         """
         Method to find a substitute to the given product.
         Finds all products with one category in common and 
@@ -124,7 +124,6 @@ class Product():
         """
         substitutes=[]
         test_list1 = []
-
         self.db.connect_to_db()
         with self.db.cnx.cursor(buffered=True, dictionary=True) as cursor:
             cursor.execute(queries.find_substitute, {'id': self.id})
@@ -140,4 +139,22 @@ class Product():
                     if score >= 50:
                         self.save_product_substitute(id['id'], score)
         self.db.disconnect_from_db()
+    
+    def get_substitute(self):
+        """
+        Method to retrieve and suggest 1 substitute
+        """
+        self.db.connect_to_db()
+        with self.db.cnx.cursor(buffered=True) as cursor:
+            cursor.execute(queries.get_product_substitutes, {'id': self.id})
+            for (substitute_id, name, nutrition_grade_fr, url, barcode) in cursor.fetchall():
+                substitute = Product(self.db, id= substitute_id, name= name, nutrition_grade= nutrition_grade_fr, url= url, barcode= barcode)
+        self.db.disconnect_from_db()
+        return substitute
 
+    def save_favorite(self):
+        self.db.connect_to_db()
+        with self.db.cnx.cursor() as cursor:
+            cursor.execute(queries.insert_user_favorite_product , {'product_id': self.id})
+        self.db.cnx.commit()
+        self.db.disconnect_from_db()

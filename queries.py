@@ -39,7 +39,7 @@ insert_product_substitute = ("INSERT IGNORE INTO Product_substitute ("
                                     "%(score)s"
                                 ")")
 
-insert_user_favorite_product = ("INSERT INTO User_favorite_product (product_id) "
+insert_user_favorite_product = ("INSERT IGNORE INTO User_favorite_product (product_id) "
                                 "VALUES ("
                                     "%(product_id)s"
                                 ")")
@@ -58,14 +58,14 @@ get_products = ("SELECT p.id, p.name_fr, p.nutrition_grade_fr, p.url, p.barcode 
                 "ORDER BY p.name_fr ASC")
 
 get_product_categories = ("SELECT c.name as 'category name' FROM Category c "
-                    "INNER JOIN Product_category pc ON pc.category_id = c.id "
-                    "INNER JOIN Product p ON p.id = pc.product_id "
-                    "WHERE p.id = %(id)s")
+                            "INNER JOIN Product_category pc ON pc.category_id = c.id "
+                            "INNER JOIN Product p ON p.id = pc.product_id "
+                            "WHERE p.id = %(id)s")
 
 get_product_brands = ("SELECT b.name as 'brand name' FROM Brand b "
-                    "INNER JOIN Product_brand pb ON pb.brand_id = b.id "
-                    "INNER JOIN Product p ON p.id = pb.product_id "
-                    "WHERE p.id = %(id)s")
+                        "INNER JOIN Product_brand pb ON pb.brand_id = b.id "
+                        "INNER JOIN Product p ON p.id = pb.product_id "
+                        "WHERE p.id = %(id)s")
 
 get_product_details = ("SELECT barcode, name_fr, nutrition_grade_fr, url, b.name, c.name FROM Product p " 
                         "INNER JOIN Product_category pc ON pc.product_id = p.id "
@@ -75,11 +75,18 @@ get_product_details = ("SELECT barcode, name_fr, nutrition_grade_fr, url, b.name
                         "WHERE p.id = %(id)s")
 
 get_product_stores = ("SELECT s.name as 'store name' FROM Store s "
-                    "INNER JOIN Product_store ps ON ps.store_id = s.id "
-                    "INNER JOIN Product p ON p.id = ps.product_id "
-                    "WHERE p.id = %(id)s")
+                        "INNER JOIN Product_store ps ON ps.store_id = s.id "
+                        "INNER JOIN Product p ON p.id = ps.product_id "
+                        "WHERE p.id = %(id)s")
+
+get_product_substitutes = ("SELECT ps.substitute_id, p.name_fr, p.nutrition_grade_fr, p.url, p.barcode FROM Product_substitute ps "
+                            "INNER JOIN Product p ON p.id = ps.substitute_id "
+                            "WHERE product_id = %(id)s "
+                            "ORDER BY ps.score DESC, p.nutrition_grade_fr ASC "
+                            "LIMIT 1")
 
 find_substitute = ( "SELECT p.id FROM Product p "
                     "WHERE p.nutrition_grade_fr != '' "
+                    "AND p.id != %(id)s "
                     "AND p.nutrition_grade_fr < (SELECT p2.nutrition_grade_fr FROM Product p2 WHERE p2.id = %(id)s) "
                     "ORDER BY p.nutrition_grade_fr ")

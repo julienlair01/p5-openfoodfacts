@@ -11,7 +11,9 @@ import requests
 FILTER_CATEGORIES = [
             'Fromages',
             'Boissons',
-            'Plats préparés'
+            'Plats préparés',
+            'Produits laitiers',
+            'Pâtes à tartiner'
         ]
 
 class CategoryService():

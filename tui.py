@@ -11,6 +11,7 @@ class TUI():
 
     def __init__(self):
         self.menu_choices = ['Trouver un substitut sain à un produit', 'Voir les produits sauvegardés', 'Quitter']
+        self.save_choices = ['Sauvegarder ce produit de substituion', 'Chercher un nouveau produit', 'Quitter']
         self.table_style = {'align': 'l', 'vrules': NONE}
 
     def menu_logic(self):
@@ -71,12 +72,31 @@ class TUI():
     def display_product_details(self, product):
         os.system('clear')
         t = PrettyTable(['Détails du produit sélectionné',''], **self.table_style)
+        t.add_row(['Id', product.id])
         t.add_row(['Marques', product.brands])
         t.add_row(['Nom', product.name])
         t.add_row(['Nutri score', product.nutrition_grade])
         t.add_row(['Distributeurs', product.stores])
         t.add_row(['+ d\'infos', product.url])
         print(t)
+
+    def display_product_substitute(self, substitute):
+        print('\n')
+        t = PrettyTable(['Voici un produit plus sain !',''], **self.table_style)
+        t.add_row(['Id', substitute.id])
+        t.add_row(['Marques', substitute.brands])
+        t.add_row(['Nom', substitute.name])
+        t.add_row(['Nutri score', substitute.nutrition_grade])
+        t.add_row(['Distributeurs', substitute.stores])
+        t.add_row(['+ d\'infos', substitute.url])
+        print(t)
+    
+    def save_favorite(self):
+        t = PrettyTable(['\nChoix', ''], vrules= NONE, hrules= NONE, align= 'l')
+        for index, value in enumerate(self.save_choices):
+            t.add_row([index+1, value])
+        print(t)
+        return input('\nQue shouhaitez-vous faire ? ')
 
     def choose_favorite(self):
         pass
