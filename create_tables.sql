@@ -89,6 +89,7 @@ ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS Product_substitute (
     product_id INT UNSIGNED NOT NULL,
     substitute_id INT UNSIGNED NOT NULL,
+    score FLOAT,
     PRIMARY KEY (product_id, substitute_id),
     UNIQUE KEY product_substitute (product_id, substitute_id),
     CONSTRAINT fk_product_id

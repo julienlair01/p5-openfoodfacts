@@ -29,7 +29,6 @@ class ProductService():
         self.db.connect_to_db()
         # faire le count
         with self.db.cnx.cursor(buffered=True) as cursor:
-            print(category.id, category.name)
             cursor.execute(queries.get_products, {'cat_id': category.id})
             if cursor.rowcount > 0:
                 for (id, name, nutrition_grade_fr, url, barcode) in cursor.fetchall():
@@ -49,8 +48,8 @@ class ProductService():
         cat_service -- CategoryService object
         category_id -- id of the category to get products from
         """
-        print('Veuillez patienter, nous téléchargeons les produits...', category.name)
-        page_size = 20
+        print('Veuillez patienter, nous téléchargeons les produits de la catégorie {}...'.format(category.name))
+        page_size = 500
         payload = {
                 'action': 'process',
                 'tagtype_0': 'countries',
@@ -75,14 +74,14 @@ class ProductService():
                                     url= clean_products['products'][i]['url'],
                                     barcode= clean_products['products'][i]['code']
                                     )
-            p_buf.insert_product_into_local(category, brands= clean_products['products'][i]['brands'], stores= clean_products['products'][i]['stores'])
+            p_buf.insert_product_into_local(categories= clean_products['products'][i]['categories_tags'], brands= clean_products['products'][i]['brands'], stores= clean_products['products'][i]['stores'])
 
     def clean_products(self, products):
         """
         Method to clean products which do not have specific keys,
         contained in keys[].
         """
-        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands', 'stores']
+        keys = ['code', 'product_name_fr', 'generic_name', 'nutrition_grade_fr', 'url', 'brands', 'stores', 'categories_tags']
         for i in range(len(products['products'])):
             for j in range(len(keys)):
                 try:

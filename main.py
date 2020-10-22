@@ -20,10 +20,14 @@ class App():
         self.tui = tui.TUI()
         
     def main_logic(self):
-        chosen_category = self.tui.show_menu(self.cat_service.categories)
+        chosen_category = self.tui.show_menu(self.cat_service.main_categories)
         self.product_service.load_products(self.cat_service, chosen_category)
         chosen_product = self.tui.select_product(self.product_service.products)
+        chosen_product.find_substitutes()
         self.tui.display_product_details(chosen_product)
-
+        self.tui.display_product_substitute(chosen_product.get_substitute())
+        if self.tui.save_favorite() == '1':
+            chosen_product.save_favorite()
+    
 app = App()
 app.main_logic()
