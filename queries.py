@@ -89,4 +89,5 @@ find_substitute = ( "SELECT p.id FROM Product p "
                     "WHERE p.nutrition_grade_fr != '' "
                     "AND p.id != %(id)s "
                     "AND p.nutrition_grade_fr < (SELECT p2.nutrition_grade_fr FROM Product p2 WHERE p2.id = %(id)s) "
+                    "AND p.nutrition_grade_fr IN ('A', 'B', 'C') "
                     "ORDER BY p.nutrition_grade_fr ")

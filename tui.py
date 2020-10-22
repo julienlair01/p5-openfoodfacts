@@ -17,22 +17,18 @@ class TUI():
     def menu_logic(self):
         pass
 
-    def show_menu(self, categories):
+    def show_menu(self):
         choice = ''
         os.system('clear')
-        while choice not in [1,2]:
-            t = PrettyTable(['Choix', ''], **self.table_style)
-            for index, value in enumerate(self.menu_choices):
-                t.add_row([index+1, value])
-            print(t)
-            choice = input('\nQue shouhaitez-vous faire ? ')
-
-            if choice == '1':
-                return(self.select_category(categories))
-            elif choice == '2':
-                self.choose_favorite()
-            else:
-                print('\nVeuillez entrer un choix valide.\n')
+        t = PrettyTable(['Choix', ''], **self.table_style)
+        for index, value in enumerate(self.menu_choices):
+            t.add_row([index+1, value])
+        print(t)
+        choice = input('\nQue souhaitez-vous faire ? ')
+        if choice in ['1', '2']:
+            return choice
+        else:
+            print('\nVeuillez entrer un choix valide.\n')
 
     def select_category(self, categories):
         os.system('clear')
@@ -82,7 +78,7 @@ class TUI():
 
     def display_product_substitute(self, substitute):
         print('\n')
-        t = PrettyTable(['Voici un produit plus sain !',''], **self.table_style)
+        t = PrettyTable(['Voici un produit plus sain !   ',''], **self.table_style)
         t.add_row(['Id', substitute.id])
         t.add_row(['Marques', substitute.brands])
         t.add_row(['Nom', substitute.name])
@@ -96,7 +92,7 @@ class TUI():
         for index, value in enumerate(self.save_choices):
             t.add_row([index+1, value])
         print(t)
-        return input('\nQue shouhaitez-vous faire ? ')
+        return input('\nQue souhaitez-vous faire ? ')
 
-    def choose_favorite(self):
+    def display_favorites(self):
         pass
